@@ -40,7 +40,7 @@ $(OBJPROG): $(addprefix $(OBJDIR)/, $(OBJECTS)) $(addprefix $(OBJDIR)/, $(CXXOBJ
 	$(GCC) -o $@ $(addprefix $(OBJDIR)/, $(OBJECTS)) $(addprefix $(OBJDIR)/, $(CXXOBJS)) $(LDFLAGS)
 	@echo ""
 	mv -f ${OBJDIR}/$(PROGS) ${BINDIR}
-	
+
 $(OBJDIR)/%.c.o : %.c
 	@mkdir -p obj
 	@echo "  CC  $<"

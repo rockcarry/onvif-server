@@ -1,6 +1,7 @@
 !.gitignore
 *.o
 *.a
+*.exe
 src/soapC_*.c
 src/soapH.h
 src/soapServer.c

@@ -73,3 +73,52 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+int SOAP_ENV__Fault(struct soap* soap, char *faultcode, char *faultstring, char *faultactor, struct SOAP_ENV__Detail *detail, struct SOAP_ENV__Code *SOAP_ENV__Code, struct SOAP_ENV__Reason *SOAP_ENV__Reason, char *SOAP_ENV__Node, char *SOAP_ENV__Role, struct SOAP_ENV__Detail *SOAP_ENV__Detail)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__Hello(struct soap* soap, struct wsdd__HelloType *wsdd__Hello)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__Bye(struct soap* soap, struct wsdd__ByeType *wsdd__Bye)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__ProbeMatches(struct soap* soap, struct wsdd__ProbeMatchesType *wsdd__ProbeMatches)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__Resolve(struct soap* soap, struct wsdd__ResolveType *wsdd__Resolve)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __wsdd__ResolveMatches(struct soap* soap, struct wsdd__ResolveMatchesType *wsdd__ResolveMatches)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __tdn__Hello(struct soap* soap, struct wsdd__HelloType tdn__Hello, struct wsdd__ResolveType *tdn__HelloResponse)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __tdn__Bye(struct soap* soap, struct wsdd__ByeType tdn__Bye, struct wsdd__ResolveType *tdn__ByeResponse)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
+
+int __tdn__Probe(struct soap* soap, struct wsdd__ProbeType tdn__Probe, struct wsdd__ProbeMatchesType *tdn__ProbeResponse)
+{
+    printf("%s\n", __func__); return SOAP_OK;
+}
