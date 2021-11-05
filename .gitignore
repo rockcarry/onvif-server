@@ -6,4 +6,5 @@ src/soapC_*.c
 src/soapH.h
 src/soapServer.c
 src/soapStub.h
+src/namespace.c
 

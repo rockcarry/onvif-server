@@ -1,19 +1,26 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include "soapStub.h"
+#include "soapH.h"
+#include "stdsoap2.h"
 
-#define ONVIF_LISTEN_PORT 3702
+#define ONVIF_DISCOVERY_PORT 3702
+#define ONVIF_SERVER_PORT    8000
+char    g_device_model [32] = "IPC-19206";
+char    g_device_name  [32] = "MyIPCamera";
+char    g_device_ipaddr[16] = "192.168.0.178";
+uint8_t g_device_mac   [6 ] = { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC };
+int     g_onvif_server_port = ONVIF_SERVER_PORT;
 
 static void* discovery_server_proc(void *param)
 {
     struct soap soap_udp;
     struct ip_mreq mcast;
 
-    soap_init1(&soap_udp, SOAP_IO_UDP);
+    soap_init1(&soap_udp, SOAP_IO_UDP|SOAP_XML_IGNORENS);
     soap_set_namespaces(&soap_udp,  namespaces);
 
-    if (!soap_valid_socket(soap_bind(&soap_udp, NULL, ONVIF_LISTEN_PORT, 10))) {
+    if (!soap_valid_socket(soap_bind(&soap_udp, NULL, ONVIF_DISCOVERY_PORT, 10))) {
         soap_print_fault(&soap_udp, stderr);
         goto done;
     }
@@ -45,7 +52,7 @@ static void onvif_server_main(void)
 
     soap_init(&onvif_soap);
     soap_set_namespaces(&onvif_soap, namespaces);
-    m = soap_bind(&onvif_soap, NULL, 82, 100);
+    m = soap_bind(&onvif_soap, NULL, ONVIF_SERVER_PORT, 10);
     if (m < 0) {
         soap_print_fault(&onvif_soap, stderr);
         goto done;
@@ -57,6 +64,7 @@ static void onvif_server_main(void)
             soap_print_fault(&onvif_soap, stderr);
         }
         soap_serve(&onvif_soap);
+        soap_destroy(&onvif_soap);
         soap_end(&onvif_soap);
     }
 
@@ -71,54 +79,4 @@ int main(int argc, char *argv[])
     onvif_server_main();
     pthread_join(hthread, NULL);
     return 0;
-}
-
-int SOAP_ENV__Fault(struct soap* soap, char *faultcode, char *faultstring, char *faultactor, struct SOAP_ENV__Detail *detail, struct SOAP_ENV__Code *SOAP_ENV__Code, struct SOAP_ENV__Reason *SOAP_ENV__Reason, char *SOAP_ENV__Node, char *SOAP_ENV__Role, struct SOAP_ENV__Detail *SOAP_ENV__Detail)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__Hello(struct soap* soap, struct wsdd__HelloType *wsdd__Hello)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__Bye(struct soap* soap, struct wsdd__ByeType *wsdd__Bye)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__ProbeMatches(struct soap* soap, struct wsdd__ProbeMatchesType *wsdd__ProbeMatches)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__Resolve(struct soap* soap, struct wsdd__ResolveType *wsdd__Resolve)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __wsdd__ResolveMatches(struct soap* soap, struct wsdd__ResolveMatchesType *wsdd__ResolveMatches)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __tdn__Hello(struct soap* soap, struct wsdd__HelloType tdn__Hello, struct wsdd__ResolveType *tdn__HelloResponse)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __tdn__Bye(struct soap* soap, struct wsdd__ByeType tdn__Bye, struct wsdd__ResolveType *tdn__ByeResponse)
-{
-    printf("%s\n", __func__); return SOAP_OK;
-}
-
-int __tdn__Probe(struct soap* soap, struct wsdd__ProbeType tdn__Probe, struct wsdd__ProbeMatchesType *tdn__ProbeResponse)
-{
-    printf("%s\n", __func__); return SOAP_OK;
 }
