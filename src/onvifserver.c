@@ -2,12 +2,16 @@
 #include <stdio.h>
 #include <pthread.h>
 #include "soapH.h"
-#include "stdsoap2.h"
+#include "onvifserver.h"
 
 #define ONVIF_DISCOVERY_PORT 3702
 #define ONVIF_SERVER_PORT    8000
-char    g_device_model [32] = "IPC-19206";
-char    g_device_name  [32] = "MyIPCamera";
+char    g_manufacturer [33] = "APICAL";
+char    g_device_model [33] = "IPC-19206";
+char    g_device_name  [33] = "MyIPCamera";
+char    g_device_fwver [33] = "v1.0.0.0";
+char    g_device_sn    [33] = "2145983366589413";
+char    g_device_hwid  [33] = "01-01-20";
 char    g_device_ipaddr[16] = "192.168.0.178";
 uint8_t g_device_mac   [6 ] = { 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC };
 int     g_onvif_server_port = ONVIF_SERVER_PORT;
@@ -80,3 +84,4 @@ int main(int argc, char *argv[])
     pthread_join(hthread, NULL);
     return 0;
 }
+

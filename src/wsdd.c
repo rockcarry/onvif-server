@@ -1,12 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "soapH.h"
-
-extern char    g_device_model [32];
-extern char    g_device_name  [32];
-extern char    g_device_ipaddr[16];
-extern uint8_t g_device_mac   [6 ];
-extern int     g_onvif_server_port;
+#include "onvifserver.h"
 
 int SOAP_ENV__Fault(struct soap* soap, char *faultcode, char *faultstring, char *faultactor, struct SOAP_ENV__Detail *detail, struct SOAP_ENV__Code *SOAP_ENV__Code, struct SOAP_ENV__Reason *SOAP_ENV__Reason, char *SOAP_ENV__Node, char *SOAP_ENV__Role, struct SOAP_ENV__Detail *SOAP_ENV__Detail)
 {
@@ -102,11 +97,6 @@ int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
     soap->header->wsa__RelatesTo->__item = soap->header->wsa__MessageID;
 
     soap_send___wsdd__ProbeMatches(soap, "http://", NULL, &ProbeMatches);
-    soap_dealloc(soap, ProbeMatches.ProbeMatch->wsa__EndpointReference.Address);
-    soap_dealloc(soap, ProbeMatches.ProbeMatch->XAddrs);
-    soap_dealloc(soap, ProbeMatches.ProbeMatch->Scopes->__item);
-    soap_dealloc(soap, ProbeMatches.ProbeMatch->Scopes);
-    soap_dealloc(soap, ProbeMatches.ProbeMatch);
     return SOAP_OK;
 }
 

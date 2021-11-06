@@ -1,8 +1,79 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "soapH.h"
 #include "soapStub.h"
+#include "onvifserver.h"
 
-int __tds__GetServices(struct soap* soap, struct _tds__GetServices *tds__GetServices, struct _tds__GetServicesResponse *tds__GetServicesResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetDeviceInformation(struct soap* soap, struct _tds__GetDeviceInformation *tds__GetDeviceInformation, struct _tds__GetDeviceInformationResponse *tds__GetDeviceInformationResponse)
+{
+    printf("%s\n", __func__);
+    tds__GetDeviceInformationResponse->Manufacturer    = soap_strdup(soap, g_manufacturer);
+    tds__GetDeviceInformationResponse->Model           = soap_strdup(soap, g_device_model);
+    tds__GetDeviceInformationResponse->FirmwareVersion = soap_strdup(soap, g_device_fwver);
+    tds__GetDeviceInformationResponse->SerialNumber    = soap_strdup(soap, g_device_sn   );
+    tds__GetDeviceInformationResponse->HardwareId      = soap_strdup(soap, g_device_hwid );
+    return SOAP_OK;
+}
+
+int __tds__GetCapabilities(struct soap* soap, struct _tds__GetCapabilities *tds__GetCapabilities, struct _tds__GetCapabilitiesResponse *tds__GetCapabilitiesResponse)
+{
+    char str_tmp[1024];
+    printf("%s\n", __func__);
+
+    tds__GetCapabilitiesResponse->Capabilities = (struct tt__Capabilities*)soap_malloc(soap, sizeof(struct tt__Capabilities));
+    soap_default_tt__Capabilities(soap, tds__GetCapabilitiesResponse->Capabilities);
+
+    tds__GetCapabilitiesResponse->Capabilities->Device = (struct tt__DeviceCapabilities*)soap_malloc(soap, sizeof(struct tt__DeviceCapabilities));
+    soap_default_tt__DeviceCapabilities(soap, tds__GetCapabilitiesResponse->Capabilities->Device);
+    sprintf(str_tmp, "http://%s:%d/onvif/device_service", g_device_ipaddr, g_onvif_server_port);
+    tds__GetCapabilitiesResponse->Capabilities->Device->XAddr = soap_strdup(soap, str_tmp);
+
+    tds__GetCapabilitiesResponse->Capabilities->Media = (struct tt__MediaCapabilities*)soap_malloc(soap, sizeof(struct tt__MediaCapabilities));
+    soap_default_tt__MediaCapabilities(soap, tds__GetCapabilitiesResponse->Capabilities->Media);
+    sprintf(str_tmp, "http://%s:%d/onvif/media", g_device_ipaddr, g_onvif_server_port);
+    tds__GetCapabilitiesResponse->Capabilities->Media->XAddr = soap_strdup(soap, str_tmp);
+
+    tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities = (struct tt__RealTimeStreamingCapabilities*)soap_malloc(soap, sizeof(struct tt__RealTimeStreamingCapabilities));
+    soap_default_tt__RealTimeStreamingCapabilities(soap, tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities);
+
+    tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTPMulticast  = (enum xsd__boolean*)soap_malloc(soap, sizeof(enum xsd__boolean));
+    tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTP_USCORETCP = (enum xsd__boolean*)soap_malloc(soap, sizeof(enum xsd__boolean));
+    tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTP_USCORERTSP_USCORETCP = (enum xsd__boolean*)soap_malloc(soap, sizeof(enum xsd__boolean));
+   *tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTPMulticast  = xsd__boolean__false_;
+   *tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTP_USCORETCP = xsd__boolean__true_;
+   *tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities->RTP_USCORERTSP_USCORETCP = xsd__boolean__true_;
+
+    return SOAP_OK;
+}
+
+int __tds__GetServices(struct soap* soap, struct _tds__GetServices *tds__GetServices, struct _tds__GetServicesResponse *tds__GetServicesResponse)
+{
+    char str_tmp[1024];
+    printf("%s\n", __func__);
+
+    tds__GetServicesResponse->__sizeService = 2;
+    tds__GetServicesResponse->Service       = (struct tds__Service*)soap_malloc(soap, sizeof(struct tds__Service) * tds__GetServicesResponse->__sizeService);
+    soap_default_tds__Service(soap, tds__GetServicesResponse->Service + 0);
+    soap_default_tds__Service(soap, tds__GetServicesResponse->Service + 1);
+
+    sprintf(str_tmp, "http://%s:%d/onvif/device_service", g_device_ipaddr, g_onvif_server_port);
+    tds__GetServicesResponse->Service[0].XAddr     = soap_strdup(soap, str_tmp);
+    tds__GetServicesResponse->Service[0].Namespace = "http://www.onvif.org/ver10/device/wsdl";
+    tds__GetServicesResponse->Service[0].Version   = (struct tt__OnvifVersion*)soap_malloc(soap, sizeof(struct tt__OnvifVersion));
+    tds__GetServicesResponse->Service[0].Version->Major = 2;
+    tds__GetServicesResponse->Service[0].Version->Minor = 40;
+
+    sprintf(str_tmp, "http://%s:%d/onvif/media", g_device_ipaddr, g_onvif_server_port);
+    tds__GetServicesResponse->Service[1].XAddr     = soap_strdup(soap, str_tmp);
+    tds__GetServicesResponse->Service[1].Namespace = "http://www.onvif.org/ver10/media/wsdl";
+    tds__GetServicesResponse->Service[1].Version   = (struct tt__OnvifVersion*)soap_malloc(soap, sizeof(struct tt__OnvifVersion));
+    tds__GetServicesResponse->Service[1].Version->Major = 2;
+    tds__GetServicesResponse->Service[1].Version->Minor = 40;
+
+    return SOAP_OK;
+}
+
 int __tds__GetServiceCapabilities(struct soap* soap, struct _tds__GetServiceCapabilities *tds__GetServiceCapabilities, struct _tds__GetServiceCapabilitiesResponse *tds__GetServiceCapabilitiesResponse) { printf("%s\n", __func__); return SOAP_OK; }
-int __tds__GetDeviceInformation(struct soap* soap, struct _tds__GetDeviceInformation *tds__GetDeviceInformation, struct _tds__GetDeviceInformationResponse *tds__GetDeviceInformationResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetSystemDateAndTime(struct soap* soap, struct _tds__SetSystemDateAndTime *tds__SetSystemDateAndTime, struct _tds__SetSystemDateAndTimeResponse *tds__SetSystemDateAndTimeResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__GetSystemDateAndTime(struct soap* soap, struct _tds__GetSystemDateAndTime *tds__GetSystemDateAndTime, struct _tds__GetSystemDateAndTimeResponse *tds__GetSystemDateAndTimeResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetSystemFactoryDefault(struct soap* soap, struct _tds__SetSystemFactoryDefault *tds__SetSystemFactoryDefault, struct _tds__SetSystemFactoryDefaultResponse *tds__SetSystemFactoryDefaultResponse) { printf("%s\n", __func__); return SOAP_OK; }
@@ -29,7 +100,6 @@ int __tds__CreateUsers(struct soap* soap, struct _tds__CreateUsers *tds__CreateU
 int __tds__DeleteUsers(struct soap* soap, struct _tds__DeleteUsers *tds__DeleteUsers, struct _tds__DeleteUsersResponse *tds__DeleteUsersResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetUser(struct soap* soap, struct _tds__SetUser *tds__SetUser, struct _tds__SetUserResponse *tds__SetUserResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__GetWsdlUrl(struct soap* soap, struct _tds__GetWsdlUrl *tds__GetWsdlUrl, struct _tds__GetWsdlUrlResponse *tds__GetWsdlUrlResponse) { printf("%s\n", __func__); return SOAP_OK; }
-int __tds__GetCapabilities(struct soap* soap, struct _tds__GetCapabilities *tds__GetCapabilities, struct _tds__GetCapabilitiesResponse *tds__GetCapabilitiesResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetDPAddresses(struct soap* soap, struct _tds__SetDPAddresses *tds__SetDPAddresses, struct _tds__SetDPAddressesResponse *tds__SetDPAddressesResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__GetHostname(struct soap* soap, struct _tds__GetHostname *tds__GetHostname, struct _tds__GetHostnameResponse *tds__GetHostnameResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetHostname(struct soap* soap, struct _tds__SetHostname *tds__SetHostname, struct _tds__SetHostnameResponse *tds__SetHostnameResponse) { printf("%s\n", __func__); return SOAP_OK; }

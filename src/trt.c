@@ -1,4 +1,6 @@
-#include "soapStub.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "soapH.h"
 
 int __trt__GetServiceCapabilities(struct soap* soap, struct _trt__GetServiceCapabilities *trt__GetServiceCapabilities, struct _trt__GetServiceCapabilitiesResponse *trt__GetServiceCapabilitiesResponse)
 {
