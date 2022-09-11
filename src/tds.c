@@ -18,19 +18,22 @@ int __tds__GetDeviceInformation(struct soap* soap, struct _tds__GetDeviceInforma
 int __tds__GetCapabilities(struct soap* soap, struct _tds__GetCapabilities *tds__GetCapabilities, struct _tds__GetCapabilitiesResponse *tds__GetCapabilitiesResponse)
 {
     char str_tmp[1024];
+    char str_ip [16];
+
     printf("%s\n", __func__);
+    g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
 
     tds__GetCapabilitiesResponse->Capabilities = (struct tt__Capabilities*)soap_malloc(soap, sizeof(struct tt__Capabilities));
     soap_default_tt__Capabilities(soap, tds__GetCapabilitiesResponse->Capabilities);
 
     tds__GetCapabilitiesResponse->Capabilities->Device = (struct tt__DeviceCapabilities*)soap_malloc(soap, sizeof(struct tt__DeviceCapabilities));
     soap_default_tt__DeviceCapabilities(soap, tds__GetCapabilitiesResponse->Capabilities->Device);
-    sprintf(str_tmp, "http://%s:%d/onvif/device_service", g_device_ipaddr, g_onvif_server_port);
+    sprintf(str_tmp, "http://%s:%d/onvif/device_service", str_ip, g_onvif_server_port);
     tds__GetCapabilitiesResponse->Capabilities->Device->XAddr = soap_strdup(soap, str_tmp);
 
     tds__GetCapabilitiesResponse->Capabilities->Media = (struct tt__MediaCapabilities*)soap_malloc(soap, sizeof(struct tt__MediaCapabilities));
     soap_default_tt__MediaCapabilities(soap, tds__GetCapabilitiesResponse->Capabilities->Media);
-    sprintf(str_tmp, "http://%s:%d/onvif/media", g_device_ipaddr, g_onvif_server_port);
+    sprintf(str_tmp, "http://%s:%d/onvif/media", str_ip, g_onvif_server_port);
     tds__GetCapabilitiesResponse->Capabilities->Media->XAddr = soap_strdup(soap, str_tmp);
 
     tds__GetCapabilitiesResponse->Capabilities->Media->StreamingCapabilities = (struct tt__RealTimeStreamingCapabilities*)soap_malloc(soap, sizeof(struct tt__RealTimeStreamingCapabilities));
@@ -49,21 +52,24 @@ int __tds__GetCapabilities(struct soap* soap, struct _tds__GetCapabilities *tds_
 int __tds__GetServices(struct soap* soap, struct _tds__GetServices *tds__GetServices, struct _tds__GetServicesResponse *tds__GetServicesResponse)
 {
     char str_tmp[1024];
+    char str_ip [16];
+
     printf("%s\n", __func__);
+    g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
 
     tds__GetServicesResponse->__sizeService = 2;
     tds__GetServicesResponse->Service       = (struct tds__Service*)soap_malloc(soap, sizeof(struct tds__Service) * tds__GetServicesResponse->__sizeService);
     soap_default_tds__Service(soap, tds__GetServicesResponse->Service + 0);
     soap_default_tds__Service(soap, tds__GetServicesResponse->Service + 1);
 
-    sprintf(str_tmp, "http://%s:%d/onvif/device_service", g_device_ipaddr, g_onvif_server_port);
+    sprintf(str_tmp, "http://%s:%d/onvif/device_service", str_ip, g_onvif_server_port);
     tds__GetServicesResponse->Service[0].XAddr     = soap_strdup(soap, str_tmp);
     tds__GetServicesResponse->Service[0].Namespace = "http://www.onvif.org/ver10/device/wsdl";
     tds__GetServicesResponse->Service[0].Version   = (struct tt__OnvifVersion*)soap_malloc(soap, sizeof(struct tt__OnvifVersion));
     tds__GetServicesResponse->Service[0].Version->Major = 2;
     tds__GetServicesResponse->Service[0].Version->Minor = 40;
 
-    sprintf(str_tmp, "http://%s:%d/onvif/media", g_device_ipaddr, g_onvif_server_port);
+    sprintf(str_tmp, "http://%s:%d/onvif/media", str_ip, g_onvif_server_port);
     tds__GetServicesResponse->Service[1].XAddr     = soap_strdup(soap, str_tmp);
     tds__GetServicesResponse->Service[1].Namespace = "http://www.onvif.org/ver10/media/wsdl";
     tds__GetServicesResponse->Service[1].Version   = (struct tt__OnvifVersion*)soap_malloc(soap, sizeof(struct tt__OnvifVersion));
@@ -160,3 +166,11 @@ int __tds__DeleteStorageConfiguration(struct soap* soap, struct _tds__DeleteStor
 int __tds__GetGeoLocation(struct soap* soap, struct _tds__GetGeoLocation *tds__GetGeoLocation, struct _tds__GetGeoLocationResponse *tds__GetGeoLocationResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__SetGeoLocation(struct soap* soap, struct _tds__SetGeoLocation *tds__SetGeoLocation, struct _tds__SetGeoLocationResponse *tds__SetGeoLocationResponse) { printf("%s\n", __func__); return SOAP_OK; }
 int __tds__DeleteGeoLocation(struct soap* soap, struct _tds__DeleteGeoLocation *tds__DeleteGeoLocation, struct _tds__DeleteGeoLocationResponse *tds__DeleteGeoLocationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetPasswordComplexityOptions(struct soap* soap, struct _tds__GetPasswordComplexityOptions *tds__GetPasswordComplexityOptions, struct _tds__GetPasswordComplexityOptionsResponse *tds__GetPasswordComplexityOptionsResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetPasswordComplexityConfiguration(struct soap* soap, struct _tds__GetPasswordComplexityConfiguration *tds__GetPasswordComplexityConfiguration, struct _tds__GetPasswordComplexityConfigurationResponse *tds__GetPasswordComplexityConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__SetPasswordComplexityConfiguration(struct soap* soap, struct _tds__SetPasswordComplexityConfiguration *tds__SetPasswordComplexityConfiguration, struct _tds__SetPasswordComplexityConfigurationResponse *tds__SetPasswordComplexityConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetPasswordHistoryConfiguration(struct soap* soap, struct _tds__GetPasswordHistoryConfiguration *tds__GetPasswordHistoryConfiguration, struct _tds__GetPasswordHistoryConfigurationResponse *tds__GetPasswordHistoryConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__SetPasswordHistoryConfiguration(struct soap* soap, struct _tds__SetPasswordHistoryConfiguration *tds__SetPasswordHistoryConfiguration, struct _tds__SetPasswordHistoryConfigurationResponse *tds__SetPasswordHistoryConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetAuthFailureWarningOptions(struct soap* soap, struct _tds__GetAuthFailureWarningOptions *tds__GetAuthFailureWarningOptions, struct _tds__GetAuthFailureWarningOptionsResponse *tds__GetAuthFailureWarningOptionsResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__GetAuthFailureWarningConfiguration(struct soap* soap, struct _tds__GetAuthFailureWarningConfiguration *tds__GetAuthFailureWarningConfiguration, struct _tds__GetAuthFailureWarningConfigurationResponse *tds__GetAuthFailureWarningConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }
+int __tds__SetAuthFailureWarningConfiguration(struct soap* soap, struct _tds__SetAuthFailureWarningConfiguration *tds__SetAuthFailureWarningConfiguration, struct _tds__SetAuthFailureWarningConfigurationResponse *tds__SetAuthFailureWarningConfigurationResponse) { printf("%s\n", __func__); return SOAP_OK; }

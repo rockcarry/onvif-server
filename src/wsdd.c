@@ -71,6 +71,8 @@ int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
         "onvif://www.onvif.org/location/city/Shenzhen\r\n"
         "onvif://www.onvif.org/location/country/China\r\n";
     char str_tmp[1024];
+    char str_ip [16];
+    char str_mac[18];
 
     struct wsdd__ProbeMatchesType ProbeMatches = {0};
     ProbeMatches.__sizeProbeMatch   = 1;
@@ -82,12 +84,16 @@ int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
     ProbeMatches.ProbeMatch->Scopes->__item  = soap_strdup(soap, str_tmp);
     ProbeMatches.ProbeMatch->Scopes->MatchBy = NULL;
 
-    sprintf(str_tmp, "http://%s:%d/onvif/device_service", g_device_ipaddr, g_onvif_server_port);
+    g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
+    sprintf(str_tmp, "http://%s:%d/onvif/device_service", str_ip, g_onvif_server_port);
     ProbeMatches.ProbeMatch->XAddrs = soap_strdup(soap, str_tmp);
     ProbeMatches.ProbeMatch->Types  = (wsdd__Probe->Types && strlen(wsdd__Probe->Types)) ? wsdd__Probe->Types : "dn:NetworkVideoTransmitter tds:Device";
 
+    g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_MAC, str_mac, sizeof(str_mac), NULL, 0);
     soap_default_wsa__EndpointReferenceType(soap, &ProbeMatches.ProbeMatch->wsa__EndpointReference);
-    sprintf(str_tmp, "urn:uuid:2419d68a-2dd2-21b2-a205-%02x%02x%02x%02x%02x%02x", g_device_mac[0], g_device_mac[1], g_device_mac[2], g_device_mac[3], g_device_mac[4], g_device_mac[5]);
+    sprintf(str_tmp, "urn:uuid:2419d68a-2dd2-21b2-a205-%c%c%c%c%c%c%c%c%c%c%c%c",
+            str_mac[0], str_mac[1 ], str_mac[3 ], str_mac[4 ], str_mac[6 ], str_mac[7 ],
+            str_mac[9], str_mac[10], str_mac[12], str_mac[13], str_mac[15], str_mac[16]);
     ProbeMatches.ProbeMatch->wsa__EndpointReference.Address = soap_strdup(soap, str_tmp);
 
     soap->header->wsa__To        = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";

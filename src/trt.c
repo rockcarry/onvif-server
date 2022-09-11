@@ -64,8 +64,8 @@ int __trt__GetProfiles(struct soap* soap, struct _trt__GetProfiles *trt__GetProf
     trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds = (struct tt__IntRectangle*)soap_malloc(soap, sizeof(struct tt__IntRectangle));
     trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->x      = 0;
     trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->y      = 0;
-    trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->width  = 1920;
-    trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->height = 1080;
+    trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->width  = g_stream_info_list[0].video_width;
+    trt__GetProfilesResponse->Profiles[0].VideoSourceConfiguration->Bounds->height = g_stream_info_list[0].video_height;
 
     trt__GetProfilesResponse->Profiles[0].AudioSourceConfiguration = (struct tt__AudioSourceConfiguration*)soap_malloc(soap, sizeof(struct tt__AudioSourceConfiguration ));
     soap_default_tt__AudioSourceConfiguration(soap, trt__GetProfilesResponse->Profiles[0].AudioSourceConfiguration);
@@ -80,33 +80,35 @@ int __trt__GetProfiles(struct soap* soap, struct _trt__GetProfiles *trt__GetProf
     trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->token      = "VideoEncoder_Token";
     trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->UseCount   = 1;
     trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Quality    = 3.0;
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Encoding   = tt__VideoEncoding__H264;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Encoding   = tt__VideoEncoding__H264; // g_stream_info_list[0].video_enctype ? tt__VideoEncoding__H265 : tt__VideoEncoding__H264;
     trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Resolution = (struct tt__VideoResolution*)soap_malloc(soap, sizeof(struct tt__VideoResolution));
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Resolution->Width  = 1920;
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Resolution->Height = 1080;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Resolution->Width  = g_stream_info_list[0].video_width;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->Resolution->Height = g_stream_info_list[0].video_height;
     trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl = (struct tt__VideoRateControl*)soap_malloc(soap, sizeof(struct tt__VideoRateControl));
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->FrameRateLimit   = 30;
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->EncodingInterval = 1;
-    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->BitrateLimit     = 2048;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->FrameRateLimit   = g_stream_info_list[0].video_frate;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->EncodingInterval = g_stream_info_list[0].video_gop;
+    trt__GetProfilesResponse->Profiles[0].VideoEncoderConfiguration->RateControl->BitrateLimit     = g_stream_info_list[0].video_bitrate;
 
     trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration = (struct tt__AudioEncoderConfiguration*)soap_malloc(soap, sizeof(struct tt__AudioEncoderConfiguration));
     soap_default_tt__AudioEncoderConfiguration(soap, trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration);
     trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->Name       = "AudioEncoder_1";
     trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->token      = "AudioEncoder_Token";
     trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->UseCount   = 1;
-    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->Encoding   = tt__AudioEncoding__G711;
-    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->Bitrate    = 64;
-    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->SampleRate = 8;
+    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->Encoding   = g_stream_info_list[0].audio_enctype ? tt__AudioEncoding__AAC : tt__AudioEncoding__G711;
+    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->Bitrate    = g_stream_info_list[0].audio_bitrate;
+    trt__GetProfilesResponse->Profiles[0].AudioEncoderConfiguration->SampleRate = g_stream_info_list[0].audio_samprate;
     return SOAP_OK;
 }
 
 int __trt__GetStreamUri(struct soap* soap, struct _trt__GetStreamUri *trt__GetStreamUri, struct _trt__GetStreamUriResponse *trt__GetStreamUriResponse)
 {
     char str_tmp[1024];
+    char str_ip [16];
     printf("%s\n", __func__); return SOAP_OK;
     trt__GetStreamUriResponse->MediaUri = (struct tt__MediaUri*)soap_malloc(soap, sizeof(struct tt__MediaUri));
     soap_default_tt__MediaUri(soap, trt__GetStreamUriResponse->MediaUri);
-    sprintf(str_tmp, "rtsp://%s/main", g_device_ipaddr);
+    g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
+    sprintf(str_tmp, "rtsp://%s/main", str_ip);
     trt__GetStreamUriResponse->MediaUri->Uri = soap_strdup(soap, str_tmp);
     trt__GetStreamUriResponse->MediaUri->InvalidAfterConnect = xsd__boolean__false_;
     trt__GetStreamUriResponse->MediaUri->InvalidAfterReboot  = xsd__boolean__false_;
