@@ -65,7 +65,6 @@ int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
     const char *scopes_message =
         "onvif://www.onvif.org/type/NetworkVideoTransmitter\r\n"
         "onvif://www.onvif.org/type/video_encoder\r\n"
-        "onvif://www.onvif.org/type/video_encoder\r\n"
         "onvif://www.onvif.org/hardware/%s\r\n"
         "onvif://www.onvif.org/name/%s\r\n"
         "onvif://www.onvif.org/location/city/Shenzhen\r\n"
@@ -80,18 +79,18 @@ int __wsdd__Probe(struct soap* soap, struct wsdd__ProbeType *wsdd__Probe)
     ProbeMatches.ProbeMatch->Scopes = (struct wsdd__ScopesType    *)soap_malloc(soap, sizeof(struct wsdd__ScopesType    ));
     ProbeMatches.ProbeMatch->MetadataVersion = 1;
 
-    sprintf(str_tmp, scopes_message, g_device_model, g_device_name);
+    snprintf(str_tmp, sizeof(str_tmp), scopes_message, g_device_model, g_device_name);
     ProbeMatches.ProbeMatch->Scopes->__item  = soap_strdup(soap, str_tmp);
     ProbeMatches.ProbeMatch->Scopes->MatchBy = NULL;
 
     g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
-    sprintf(str_tmp, "http://%s:%d/onvif/device_service", str_ip, g_onvif_server_port);
+    snprintf(str_tmp, sizeof(str_tmp), "http://%s:%d/onvif/device_service", str_ip, g_onvif_server_port);
     ProbeMatches.ProbeMatch->XAddrs = soap_strdup(soap, str_tmp);
     ProbeMatches.ProbeMatch->Types  = (wsdd__Probe->Types && strlen(wsdd__Probe->Types)) ? wsdd__Probe->Types : "dn:NetworkVideoTransmitter tds:Device";
 
     g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_MAC, str_mac, sizeof(str_mac), NULL, 0);
     soap_default_wsa__EndpointReferenceType(soap, &ProbeMatches.ProbeMatch->wsa__EndpointReference);
-    sprintf(str_tmp, "urn:uuid:2419d68a-2dd2-21b2-a205-%c%c%c%c%c%c%c%c%c%c%c%c",
+    snprintf(str_tmp, sizeof(str_tmp), "urn:uuid:2419d68a-2dd2-21b2-a205-%c%c%c%c%c%c%c%c%c%c%c%c",
             str_mac[0], str_mac[1 ], str_mac[3 ], str_mac[4 ], str_mac[6 ], str_mac[7 ],
             str_mac[9], str_mac[10], str_mac[12], str_mac[13], str_mac[15], str_mac[16]);
     ProbeMatches.ProbeMatch->wsa__EndpointReference.Address = soap_strdup(soap, str_tmp);

@@ -5,7 +5,7 @@ STRIP ?= $(CROSS_COMPILE)strip
 
 C_FLAGS := -Wall -Wno-unused-but-set-variable -Os -fPIC -DPIC -ffunction-sections -DWITH_OPENSSL
 
-LDFLAGS := -lpthread -lws2_32 -lcrypto -lssl
+LDFLAGS := -lpthread -lcrypto -lssl
 
 C_INCLUDES :=
 
@@ -47,7 +47,6 @@ $(OBJPROG): onvifserver.h onvifserver.c $(OBJLIB)
 	@mkdir -p $(BINDIR)
 	@echo "  BIN $@"
 	@$(GCC) -o $@ -D_TEST_ onvifserver.c $(OBJLIB) $(LDFLAGS)
-	@$(STRIP) --strip-all $@
 
 $(OBJDIR)/%.c.o : %.c
 	@mkdir -p obj

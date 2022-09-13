@@ -108,7 +108,7 @@ int __trt__GetStreamUri(struct soap* soap, struct _trt__GetStreamUri *trt__GetSt
     trt__GetStreamUriResponse->MediaUri = (struct tt__MediaUri*)soap_malloc(soap, sizeof(struct tt__MediaUri));
     soap_default_tt__MediaUri(soap, trt__GetStreamUriResponse->MediaUri);
     g_onvif_callback(g_onvif_cbctx, ONVIF_CBCMD_GET_IP, str_ip, sizeof(str_ip), NULL, 0);
-    sprintf(str_tmp, "rtsp://%s/main", str_ip);
+    snprintf(str_tmp, sizeof(str_tmp), "rtsp://%s/main", str_ip);
     trt__GetStreamUriResponse->MediaUri->Uri = soap_strdup(soap, str_tmp);
     trt__GetStreamUriResponse->MediaUri->InvalidAfterConnect = xsd__boolean__false_;
     trt__GetStreamUriResponse->MediaUri->InvalidAfterReboot  = xsd__boolean__false_;

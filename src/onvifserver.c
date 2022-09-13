@@ -31,7 +31,7 @@ static pthread_t s_hthread_servermain = (pthread_t)NULL;
 static void def_onvif_callback(void *cbctx, int cmd, void *arg1, int len1, void *arg2, int len2)
 {
     switch (cmd) {
-    case ONVIF_CBCMD_GET_IP : strncpy(arg1, "192.168.0.100", len1); break;
+    case ONVIF_CBCMD_GET_IP : strncpy(arg1, "192.168.0.178", len1); break;
     case ONVIF_CBCMD_GET_MAC: strncpy(arg1, "123456789ABC" , len1); break;
     }
 }
@@ -42,7 +42,7 @@ static void* discovery_server_proc(void *param)
     struct ip_mreq mcast;
 
     soap_init1(&soap_udp, SOAP_IO_UDP|SOAP_XML_IGNORENS);
-    soap_set_namespaces(&soap_udp,  namespaces);
+    soap_set_namespaces(&soap_udp, namespaces);
 
     if (!soap_valid_socket(soap_bind(&soap_udp, NULL, ONVIF_DISCOVERY_PORT, 10))) {
         soap_print_fault(&soap_udp, stderr);
@@ -124,13 +124,23 @@ int onvif_server_start(char *manufacturer, char *dev_model, char *dev_name, char
 void onvif_server_stop(void)
 {
     s_exit_server = 1;
-    if (s_hthread_discovery ) { pthread_join(s_hthread_discovery , NULL); s_hthread_discovery = NULL; }
-    if (s_hthread_servermain) { pthread_join(s_hthread_servermain, NULL); s_hthread_servermain= NULL; }
+    if (s_hthread_discovery ) { pthread_join(s_hthread_discovery , NULL); s_hthread_discovery = (pthread_t)NULL; }
+    if (s_hthread_servermain) { pthread_join(s_hthread_servermain, NULL); s_hthread_servermain= (pthread_t)NULL; }
 }
 
 #ifdef _TEST_
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 int main(int argc, char *argv[])
 {
+#ifdef WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        exit(1);
+    }
+#endif
+
     onvif_server_start(NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL);
     while (1) {
         char cmd[256];
@@ -138,6 +148,10 @@ int main(int argc, char *argv[])
         if (strcmp(cmd, "exit") == 0 || strcmp(cmd, "quit") == 0) break;
     }
     onvif_server_stop();
+
+#ifdef WIN32
+    WSACleanup();
+#endif
     return 0;
 }
 #endif
